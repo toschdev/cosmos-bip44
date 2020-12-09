@@ -86,8 +86,8 @@ export default class ReactComponent extends React.Component {
             index: i,
             path: `m/44'/118'/${account}'/0/${i}`,
             keys: {
-                publicKey: Buffer.from(getPublicKeyFromMnemonic(mnemonic, account, i)).toString('base64'),
-                privateKey: Buffer.from(getPrivateKeyFromMnemonic(mnemonic, account, i)).toString('base64')
+                publicKey: Buffer.from(getPublicKeyFromMnemonic(mnemonic, account, i)).toString('hex'),
+                privateKey: Buffer.from(getPrivateKeyFromMnemonic(mnemonic, account, i)).toString('hex')
             },
             address: getAddressFromMnemonic(mnemonic, "cosmos", account, i)
         }
@@ -104,112 +104,116 @@ export default class ReactComponent extends React.Component {
             <div className="loading" style={{display: loading ? "block" : "none"}}>
                 <img src={loadingPic} className="loadingImg" alt="loading" />
             </div>
-    <Row>
-        <Col>
-        </Col>
-        <Col xs={8}>
-            
-            <h2>Cosmos SDK Mnemonic Converter</h2>
-            <Form>
-                <Form.Group controlId="formMnemonic">
-                    <Form.Label>Mnemonic</Form.Label>
-                    <Form.Control type="text" name="mnemonic" value={mnemonic} placeholder="Enter mnemonic" onChange={handleInputChange} autoFocus />
-                    <Form.Text className="text-muted">
-                        Your 12/24 word mnemonic
-                    </Form.Text>
-                </Form.Group>
-            </Form>
-
-        </Col>
-        <Col>
-        </Col>
-      </Row>
-      <hr/>
-
-      <Row>
-        <Col>
-        </Col>
-        <Col xs={8}>
-            
-            <h2>Derivation Path</h2>
-
-            <Form.Group as={Row} controlId="formPurpose">
-                <Form.Label column sm="2">
-                    Purpose
-                </Form.Label>
-                <Col sm="10">
-                    <Form.Control type="text" value="44" readOnly />
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formCoin">
-                <Form.Label column sm="2">
-                    Coin
-                </Form.Label>
-                <Col sm="10">
-                    <Form.Control type="text" value="118" readOnly />
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formCoin">
-                <Form.Label column sm="2">
-                    Account
-                </Form.Label>
-                <Col sm="10">
-                    <Form.Control name="account" type="numeric" value={account} onChange={handleAccountChange} />
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formInternal">
-                <Form.Label column sm="2">
-                    External / Internal
-                </Form.Label>
-                <Col sm="10">
-                    <Form.Control type="text" value="0" readOnly />
-                </Col>
-            </Form.Group>
-
-            <p>The BIP32 derivation path and extended keys are the basis for the derived addresses.</p>
-
-            <Form.Group as={Row} controlId="formBip32DerivationPath">
-                <Form.Label column sm="2">
-                BIP32 Derivation Path
-                </Form.Label>
-                <Col sm="10">
-                    <Form.Control type="text" value={`m/44'/118'/${account}'/0`} readOnly />
-                </Col>
-            </Form.Group>
-        </Col>
-        <Col>
-        </Col>
-      </Row>
-      <hr/>
-      <Row>
-          <Col>
-            <h2>Derived Addresses</h2>
-
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                        <th>Path</th>
-                        <th>Address</th>
-                        <th>Public Key<br/><small>tendermint/PubKeySecp256k1</small></th>
-                        <th>Private Key</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {addressData ? this.state.addressData.map((a, i) => 
-                            <tr key={i}>
-                                <td>{a.path}</td>
-                                <td>{a.address}</td>
-                                <td>{a.keys.publicKey.toString("hex")}</td>
-                                <td>{a.keys.privateKey.toString("hex")}</td>
-                            </tr>
-                        ) : ""}
-                    </tbody>
-                    </Table>
+        
+        <Row style={{padding: "30px"}}>
+            <Col>
             </Col>
-      </Row>
+            <Col xs={8}>
+                
+                <h2 style={{margin: "20px"}}>Cosmos SDK BIP44 Mnemonic Converter</h2>
+                <Form>
+                    <Form.Group as={Row} controlId="formMnemonic">
+                        <Form.Label column sm="2">Mnemonic</Form.Label>
+                        <Col sm="10">
+                            <Form.Control type="text" name="mnemonic" value={mnemonic} placeholder="Enter mnemonic" onChange={handleInputChange} autoFocus />
+                            <Form.Text className="text-muted">
+                                Your 12/24 word mnemonic
+                            </Form.Text>
+                        </Col>  
+                        
+                    </Form.Group>
+                </Form>
+
+            </Col>
+            <Col>
+            </Col>
+        </Row>
+        <hr/>
+
+        <Row>
+            <Col>
+            </Col>
+            <Col xs={8}>
+                
+                <h2>Derivation Path</h2>
+
+                <Form.Group as={Row} controlId="formPurpose">
+                    <Form.Label column sm="2">
+                        Purpose
+                    </Form.Label>
+                    <Col sm="10">
+                        <Form.Control type="text" value="44" readOnly />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} controlId="formCoin">
+                    <Form.Label column sm="2">
+                        Coin
+                    </Form.Label>
+                    <Col sm="10">
+                        <Form.Control type="text" value="118" readOnly />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} controlId="formCoin">
+                    <Form.Label column sm="2">
+                        Account
+                    </Form.Label>
+                    <Col sm="10">
+                        <Form.Control name="account" type="numeric" value={account} onChange={handleAccountChange} />
+                    </Col>
+                </Form.Group>
+
+                <Form.Group as={Row} controlId="formInternal">
+                    <Form.Label column sm="2">
+                        External / Internal
+                    </Form.Label>
+                    <Col sm="10">
+                        <Form.Control type="text" value="0" readOnly />
+                    </Col>
+                </Form.Group>
+
+                <p>The BIP32 derivation path and extended keys are the basis for the derived addresses.</p>
+
+                <Form.Group as={Row} controlId="formBip32DerivationPath">
+                    <Form.Label column sm="2">
+                    BIP32 Derivation Path
+                    </Form.Label>
+                    <Col sm="10">
+                        <Form.Control type="text" value={`m/44'/118'/${account}'/0`} readOnly />
+                    </Col>
+                </Form.Group>
+            </Col>
+            <Col>
+            </Col>
+        </Row>
+        <hr/>
+        <Row>
+            <Col>
+                <h2>Derived Addresses</h2>
+
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                            <th>Path</th>
+                            <th>Address</th>
+                            <th>Public Key<br/><small>tendermint/PubKeySecp256k1</small></th>
+                            <th>Private Key</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {addressData ? this.state.addressData.map((a, i) => 
+                                <tr key={i}>
+                                    <td>{a.path}</td>
+                                    <td>{a.address}</td>
+                                    <td>{a.keys.publicKey.toString("hex")}</td>
+                                    <td>{a.keys.privateKey.toString("hex")}</td>
+                                </tr>
+                            ) : ""}
+                        </tbody>
+                        </Table>
+                </Col>
+        </Row>
       </div>
     );
   }
@@ -341,27 +345,6 @@ function getAddressFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=
 	const publicKey = getPublicKeyFromMnemonic(mnemonic, bip44account, bip44address);
 	return getAddressFromPublicKey(publicKey, prefix);
 }
-
-
-/**
- * Gets an account from a mnemonic
- *
- * @method getAccountFromMnemonic
- * @param {String} menmonic the given mnemonic
- * @param {String} bip44account the given account number point of BIP44
- * @param {String} address the given address point of BIP44
- * @return {String}
- */
-function getAccountFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=0) {
-	const publicKey = getPublicKeyFromMnemonic(mnemonic, bip44account, bip44address);
-	const address  = getAddressFromPublicKey(publicKey, prefix);
-	return {
-		address,
-		bip44path: bip44path(bip44account, bip44address),
-		publicKey: Buffer.from(publicKey).toString("hex"),
-	};
-}
-
 
 function hash160(buffer) {
     const sha256Hash = createHash('sha256')
