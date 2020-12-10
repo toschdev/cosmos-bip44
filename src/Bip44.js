@@ -14,6 +14,7 @@ import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import GithubCorner from 'react-github-corner';
 import loadingPic from './loading.gif';
 
 const bip39 = require('bip39');
@@ -372,6 +373,7 @@ export default class ReactComponent extends React.Component {
                         </Table>
                 </Col>
         </Row>
+        <GithubCorner href="https://github.com/tosch110/cosmos-bip44" />
       </div>
     );
   }
