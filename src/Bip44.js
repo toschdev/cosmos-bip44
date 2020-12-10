@@ -11,6 +11,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
+import InputGroup from 'react-bootstrap/InputGroup';
 import loadingPic from './loading.gif';
 
 const bip39 = require('bip39');
@@ -205,7 +206,12 @@ export default class ReactComponent extends React.Component {
                         Purpose
                     </Form.Label>
                     <Col sm="10">
-                        <Form.Control type="text" value="44" readOnly />
+                        <InputGroup className="mb-2">
+                            <Form.Control type="text" value="44" readOnly />
+                            <InputGroup.Append>
+                            <InputGroup.Text>'</InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>
                     </Col>
                 </Form.Group>
 
@@ -214,7 +220,12 @@ export default class ReactComponent extends React.Component {
                         Coin
                     </Form.Label>
                     <Col sm="10">
-                        <Form.Control type="text" value="118" readOnly />
+                        <InputGroup className="mb-2">
+                            <Form.Control type="text" value="118" readOnly />
+                            <InputGroup.Append>
+                            <InputGroup.Text>'</InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>
                     </Col>
                 </Form.Group>
 
@@ -223,7 +234,12 @@ export default class ReactComponent extends React.Component {
                         Account
                     </Form.Label>
                     <Col sm="10">
-                        <Form.Control name="account" type="numeric" value={account} onChange={handleAccountChange} />
+                        <InputGroup className="mb-2">
+                            <Form.Control name="account" type="numeric" value={account} onChange={handleAccountChange} />
+                            <InputGroup.Append>
+                            <InputGroup.Text>'</InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>
                     </Col>
                 </Form.Group>
 
@@ -364,7 +380,7 @@ const bip44path = (bip44account = 0, bip44address = 0) => `m/44'/118'/${bip44acc
 function getKeyPairFromMnemonic(mnemonic, bip44account = 0, bip44address = 0) {
 	const seed = bip39.mnemonicToSeedSync(mnemonic);
 	const node = bip32.fromSeed(seed);
-	const child = node.derivePath(bip44path(bip44account, bip44address));
+    const child = node.derivePath(bip44path(bip44account, bip44address));
 	const ecpair = new ECPair(child.privateKey);
 
 	return {
