@@ -302,8 +302,13 @@ export default class ReactComponent extends React.Component {
                     <Form.Label column sm="2">
                         External / Internal
                     </Form.Label>
-                    <Col sm="10">
+                    <Col sm="9">
                         <Form.Control type="text" value="0" readOnly />
+                    </Col>
+                    <Col>
+                        <OverlayTrigger trigger="click" placement="top" overlay={popoverExternal}>
+                            <Button variant="primary">?</Button>
+                        </OverlayTrigger>
                     </Col>
                 </Form.Group>
 
@@ -424,6 +429,19 @@ const popoverMnemonic = (
         </Popover.Content>
     </Popover>
 );
+
+const popoverExternal = (
+    <Popover id="popover-external">
+        <Popover.Title as="h3">External/Internal</Popover.Title>
+        <Popover.Content>
+        Constant 0 is used for external chain and constant 1 for internal chain (also known as change addresses). External chain is used for addresses that are meant to be visible outside of the wallet (e.g. for receiving payments). Internal chain is used for addresses which are not meant to be visible outside of the wallet and is used for return transaction change.
+        <br/>
+        Public derivation is used at this level.
+        </Popover.Content>
+    </Popover>
+);
+
+
 
 
 /**
