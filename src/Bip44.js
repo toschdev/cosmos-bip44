@@ -12,6 +12,8 @@ import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Popover from 'react-bootstrap/Popover';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import loadingPic from './loading.gif';
 
 const bip39 = require('bip39');
@@ -188,7 +190,7 @@ export default class ReactComponent extends React.Component {
                 <Row>
                     <Col></Col>
                     <Col>
-                        <Button style={{margin: "10px"}} onClick={onClickMnemonic}>Generate new Mnemonic</Button>
+                        <Button style={{margin: "10px"}} onClick={onClickMnemonic} variant="success">Generate new Mnemonic</Button>
                     </Col>
                     <Col>
                         <Form.Group as={Row} controlId="form.selectBufferEncoding">
@@ -210,16 +212,20 @@ export default class ReactComponent extends React.Component {
                 <Form>
                     <Form.Group as={Row} controlId="formMnemonic">
                         <Form.Label column sm="2">Mnemonic</Form.Label>
-                        <Col sm="10">
+                        <Col sm="9">
                             <Form.Control type="text" name="mnemonic" value={mnemonic} placeholder="Enter mnemonic" onChange={handleInputChange} autoFocus />
                             <Form.Text className="text-muted">
-                                Your 12/24 word mnemonic
+                                Your mnemonic passphrase as words.
                             </Form.Text>
                         </Col>  
-                        
+                        <Col>
+                        <OverlayTrigger trigger="click" placement="top" overlay={popoverMnemonic}>
+                            <Button variant="primary">?</Button>
+                        </OverlayTrigger>
+                    </Col>
                     </Form.Group>
                 </Form>
-                {validBip39Mnemonic ? null : <p style={{color: "red"}}><i>Given mnemonic is not a valid BIP39 mnemonic</i></p>}
+                {validBip39Mnemonic ? null : <p style={{color: "red"}}><i>Given mnemonic is not a valid BIP39 mnemonic.</i></p>}
             </Col>
             <Col>
             </Col>
@@ -237,7 +243,7 @@ export default class ReactComponent extends React.Component {
                     <Form.Label column sm="2">
                         Purpose
                     </Form.Label>
-                    <Col sm="10">
+                    <Col sm="9">
                         <InputGroup className="mb-2">
                             <Form.Control type="text" value="44" readOnly />
                             <InputGroup.Append>
@@ -245,13 +251,19 @@ export default class ReactComponent extends React.Component {
                             </InputGroup.Append>
                         </InputGroup>
                     </Col>
+                    <Col>
+                        <OverlayTrigger trigger="click" placement="top" overlay={popoverPurpose}>
+                            <Button variant="primary">?</Button>
+                        </OverlayTrigger>
+                    </Col>
+
                 </Form.Group>
 
                 <Form.Group as={Row} controlId="formCoin">
                     <Form.Label column sm="2">
                         Coin
                     </Form.Label>
-                    <Col sm="10">
+                    <Col sm="9">
                         <InputGroup className="mb-2">
                             <Form.Control type="text" value="118" readOnly />
                             <InputGroup.Append>
@@ -259,19 +271,29 @@ export default class ReactComponent extends React.Component {
                             </InputGroup.Append>
                         </InputGroup>
                     </Col>
+                    <Col>
+                        <OverlayTrigger trigger="click" placement="top" overlay={popoverCoin}>
+                            <Button variant="primary">?</Button>
+                        </OverlayTrigger>
+                    </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} controlId="formCoin">
                     <Form.Label column sm="2">
                         Account
                     </Form.Label>
-                    <Col sm="10">
+                    <Col sm="9">
                         <InputGroup className="mb-2">
                             <Form.Control name="account" type="numeric" value={account} onChange={handleAccountChange} />
                             <InputGroup.Append>
                             <InputGroup.Text>'</InputGroup.Text>
                             </InputGroup.Append>
                         </InputGroup>
+                    </Col>
+                    <Col>
+                        <OverlayTrigger trigger="click" placement="top" overlay={popoverAccount}>
+                            <Button variant="primary">?</Button>
+                        </OverlayTrigger>
                     </Col>
                 </Form.Group>
 
@@ -283,8 +305,6 @@ export default class ReactComponent extends React.Component {
                         <Form.Control type="text" value="0" readOnly />
                     </Col>
                 </Form.Group>
-
-                <p>The BIP32 derivation path and extended keys are the basis for the derived addresses.</p>
 
                 <Form.Group as={Row} controlId="formBip32DerivationPath">
                     <Form.Label column sm="2">
@@ -357,6 +377,53 @@ export default class ReactComponent extends React.Component {
   }
 }
 
+const popoverPurpose = (
+    <Popover id="popover-purpose">
+        <Popover.Title as="h3">Purpose</Popover.Title>
+        <Popover.Content>
+        Purpose is a constant set to 44' (hardened) following <a href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki" target="new">BIP44</a>. <br/>It indicates that the subtree of this node is used according to this specification.
+        <br />
+        Hardened derivation is used at this level.
+        </Popover.Content>
+    </Popover>
+);
+
+const popoverCoin = (
+    <Popover id="popover-coin">
+        <Popover.Title as="h3">Coin type</Popover.Title>
+        <Popover.Content>
+        Coin type level creates a separate subtree for every cryptocoin, avoiding reusing addresses across cryptocoins and improving privacy issues.
+        <br/>
+        The Cosmos SDK is registered with 118.
+        <br />
+        Hardened derivation is used at this level.
+        </Popover.Content>
+    </Popover>
+);
+
+const popoverAccount = (
+    <Popover id="popover-account">
+        <Popover.Title as="h3">Account</Popover.Title>
+        <Popover.Content>
+        Users can use these accounts to organize the funds in the same fashion as bank accounts; for donation purposes (where all addresses are considered public), for saving purposes, for common expenses etc.
+        <br/>
+        Accounts are numbered from index 0 in sequentially increasing manner. This number is used as child index in BIP32 derivation.
+        <br/>
+        Hardened derivation is used at this level.
+        </Popover.Content>
+    </Popover>
+);
+
+const popoverMnemonic = (
+    <Popover id="popover-account">
+        <Popover.Title as="h3">Mnemonic</Popover.Title>
+        <Popover.Content>
+        Passphrase mnemonics are a combination of words that provide a convinient and secure way to save cryptographic keys. 
+        </Popover.Content>
+    </Popover>
+);
+
+
 /**
  * Creates points on the Elliptic Curve for the KeyPair
  *
@@ -381,7 +448,6 @@ class ECPair {
 	  return this.__Q;
 	}
 }
-
 
 /**
  * Creates the BIP44 path given account and address
