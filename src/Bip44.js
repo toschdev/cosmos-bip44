@@ -10,6 +10,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
 import loadingPic from './loading.gif';
 
 const bip39 = require('bip39');
@@ -25,15 +26,20 @@ export default class ReactComponent extends React.Component {
     super(props);
 
     this.state = {
-      mnemonic: '',
+      mnemonic: "",
       addressData: [],
       account: 0,
       loading: false,
+      prefix: "cosmos",
+      encoding: "hex",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleAccountChange = this.handleAccountChange.bind(this);
     this.getAddressData = this.getAddressData.bind(this);
+    this.handlePrefixChange = this.handlePrefixChange.bind(this);
+    this.handleEncodingChange = this.handleEncodingChange.bind(this);
+    this.onClickMnemonic = this.onClickMnemonic.bind(this);
   }
 
   handleInputChange(event) {
@@ -42,12 +48,11 @@ export default class ReactComponent extends React.Component {
         loading: true,
         mnemonic,
     });
-    let that = this;
 
     setTimeout(() => {
-        let addressData = this.getAddressData(mnemonic, that.state.account);
+        let addressData = this.getAddressData();
     
-        that.setState({
+        this.setState({
           addressData,
           loading: false,
         });
@@ -65,20 +70,20 @@ export default class ReactComponent extends React.Component {
         loading: true,
         account,
     });
-    let that = this;
 
     setTimeout(() => {
-        let addressData = this.getAddressData(that.state.mnemonic, account);
+        let addressData = this.getAddressData();
     
-        that.setState({
+        this.setState({
           addressData,
           loading: false,
         });
     }, 100);
   }
 
-  getAddressData(mnemonic, account) {
-    let walletData = [0,1,2,3,4,5,6,7,8,9]
+  getAddressData() {
+    let { mnemonic, account, prefix, encoding } = this.state;
+    let walletData = [0,1,2,3,4,5,6,7]
 
     let returnData = walletData.map((a, i) => {
         console.log(account);
@@ -86,19 +91,71 @@ export default class ReactComponent extends React.Component {
             index: i,
             path: `m/44'/118'/${account}'/0/${i}`,
             keys: {
-                publicKey: Buffer.from(getPublicKeyFromMnemonic(mnemonic, account, i)).toString('hex'),
-                privateKey: Buffer.from(getPrivateKeyFromMnemonic(mnemonic, account, i)).toString('hex')
+                publicKey: Buffer.from(getPublicKeyFromMnemonic(mnemonic, account, i)).toString(encoding),
+                privateKey: Buffer.from(getPrivateKeyFromMnemonic(mnemonic, account, i)).toString(encoding)
             },
-            address: getAddressFromMnemonic(mnemonic, "cosmos", account, i)
+            address: getAddressFromMnemonic(mnemonic, prefix, account, i)
         }
         return obj
     });
     return returnData;
   }
 
+  handlePrefixChange(event) {
+    let prefix = event.target.value;
+    this.setState({
+        loading: true,
+        prefix,
+    });
+
+    setTimeout(() => {
+        let addressData = this.getAddressData();
+    
+        this.setState({
+          addressData,
+          loading: false,
+        });
+    }, 100);
+  }
+
+  handleEncodingChange(event) {
+      let encoding = event.target.value;
+      this.setState({
+          loading: true,
+          encoding,
+      });
+      let that = this;
+  
+      setTimeout(() => {
+          let addressData = this.getAddressData();
+      
+          that.setState({
+            addressData,
+            loading: false,
+          });
+      }, 100);
+
+  }
+
+  onClickMnemonic() {
+    const mnemonic = newMnemonic();
+    this.setState({
+        loading: true,
+        mnemonic
+    });
+    setTimeout(() => {
+        let addressData = this.getAddressData();
+    
+        this.setState({
+          addressData,
+          loading: false,
+        });
+    }, 100);
+  }
+
   render() {
-    const { mnemonic, account, addressData, loading } = this.state;
-    const { handleInputChange, handleAccountChange } = this;
+    const { mnemonic, account, prefix, addressData, loading } = this.state;
+    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic } = this;
     return (
         <div>
             <div className="loading" style={{display: loading ? "block" : "none"}}>
@@ -111,6 +168,12 @@ export default class ReactComponent extends React.Component {
             <Col xs={8}>
                 
                 <h2 style={{margin: "20px"}}>Cosmos SDK BIP44 Mnemonic Converter</h2>
+                <Row>
+                    <Col>
+                        <Button style={{margin: "10px"}} onClick={onClickMnemonic}>Generate new Mnemonic</Button>
+                    </Col>
+                </Row>
+                
                 <Form>
                     <Form.Group as={Row} controlId="formMnemonic">
                         <Form.Label column sm="2">Mnemonic</Form.Label>
@@ -191,6 +254,33 @@ export default class ReactComponent extends React.Component {
         <Row>
             <Col>
                 <h2>Derived Addresses</h2>
+                
+                <Row>
+                    <Col>
+                        <Form.Group as={Row} controlId="formBip32DerivationPath">
+                            <Form.Label column sm="2">
+                            Prefix
+                            </Form.Label>
+                            <Col sm="5">
+                                <Form.Control type="text" value={prefix} onChange={handlePrefixChange} />
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group as={Row} controlId="form.selectBufferEncoding">
+                            <Form.Label column sm="2">Key encoding</Form.Label>
+                            <Col sm="5">
+                                <Form.Control as="select" onChange={handleEncodingChange}>
+                                <option value="hex">hex</option>
+                                <option value="base64">base64</option>
+                                </Form.Control>
+                            </Col>
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                    </Col>
+                </Row>
+                
 
                     <Table striped bordered hover>
                         <thead>
@@ -202,7 +292,7 @@ export default class ReactComponent extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {addressData ? this.state.addressData.map((a, i) => 
+                            {mnemonic === "" ? null : addressData ? this.state.addressData.map((a, i) => 
                                 <tr key={i}>
                                     <td>{a.path}</td>
                                     <td>{a.address}</td>
@@ -345,6 +435,17 @@ function getAddressFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=
 	const publicKey = getPublicKeyFromMnemonic(mnemonic, bip44account, bip44address);
 	return getAddressFromPublicKey(publicKey, prefix);
 }
+
+/**
+ * Creates a new mnemonic
+ *
+ * @method newMnemonic
+ * @return {String}
+ */
+function newMnemonic() {
+    return bip39.generateMnemonic();
+}
+
 
 function hash160(buffer) {
     const sha256Hash = createHash('sha256')

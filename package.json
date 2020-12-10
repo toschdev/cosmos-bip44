@@ -2,6 +2,7 @@
   "homepage": "https://tosch110.github.io/cosmos-bip44",
   "name": "cosmos-bip44",
   "author": "Tobias Schwarz",
+  "description": "Converts a mnemonic passphrase to Cosmos SDK address in BIP44 format",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
