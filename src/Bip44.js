@@ -33,6 +33,8 @@ export default class ReactComponent extends React.Component {
       loading: false,
       prefix: "cosmos",
       encoding: "hex",
+      wordEntropy: "128",
+      validBip39Mnemonic: true,
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -41,13 +43,17 @@ export default class ReactComponent extends React.Component {
     this.handlePrefixChange = this.handlePrefixChange.bind(this);
     this.handleEncodingChange = this.handleEncodingChange.bind(this);
     this.onClickMnemonic = this.onClickMnemonic.bind(this);
+    this.handleWordChange = this.handleWordChange.bind(this);
   }
 
   handleInputChange(event) {
     let mnemonic = event.target.value;
+    let validBip39Mnemonic = validateMnemonic(mnemonic);
+    console.log(validBip39Mnemonic);
     this.setState({
         loading: true,
         mnemonic,
+        validBip39Mnemonic,
     });
 
     setTimeout(() => {
@@ -84,18 +90,19 @@ export default class ReactComponent extends React.Component {
 
   getAddressData() {
     let { mnemonic, account, prefix, encoding } = this.state;
-    let walletData = [0,1,2,3,4,5,6,7]
+    let walletData = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
 
     let returnData = walletData.map((a, i) => {
         console.log(account);
+        const acc = getAccountFromMnemonic(mnemonic, prefix, account, i);
         let obj = {
             index: i,
-            path: `m/44'/118'/${account}'/0/${i}`,
+            path: acc.bip44path,
             keys: {
-                publicKey: Buffer.from(getPublicKeyFromMnemonic(mnemonic, account, i)).toString(encoding),
-                privateKey: Buffer.from(getPrivateKeyFromMnemonic(mnemonic, account, i)).toString(encoding)
+                publicKey: Buffer.from(acc.publicKey).toString(encoding),
+                privateKey: Buffer.from(acc.privateKey).toString(encoding)
             },
-            address: getAddressFromMnemonic(mnemonic, prefix, account, i)
+            address: acc.address
         }
         return obj
     });
@@ -139,10 +146,12 @@ export default class ReactComponent extends React.Component {
   }
 
   onClickMnemonic() {
-    const mnemonic = newMnemonic();
+    const mnemonic = newMnemonic(this.state.wordEntropy);
+    let validBip39Mnemonic = validateMnemonic(mnemonic);
     this.setState({
         loading: true,
-        mnemonic
+        mnemonic,
+        validBip39Mnemonic
     });
     setTimeout(() => {
         let addressData = this.getAddressData();
@@ -154,9 +163,16 @@ export default class ReactComponent extends React.Component {
     }, 100);
   }
 
+  handleWordChange(event) {
+    let word = event.target.value;
+    this.setState({
+        wordEntropy: word
+    });
+  }
+
   render() {
-    const { mnemonic, account, prefix, addressData, loading } = this.state;
-    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic } = this;
+    const { mnemonic, account, prefix, addressData, validBip39Mnemonic, loading } = this.state;
+    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic, handleWordChange } = this;
     return (
         <div>
             <div className="loading" style={{display: loading ? "block" : "none"}}>
@@ -170,8 +186,24 @@ export default class ReactComponent extends React.Component {
                 
                 <h2 style={{margin: "20px"}}>Cosmos SDK BIP44 Mnemonic Converter</h2>
                 <Row>
+                    <Col></Col>
                     <Col>
                         <Button style={{margin: "10px"}} onClick={onClickMnemonic}>Generate new Mnemonic</Button>
+                    </Col>
+                    <Col>
+                        <Form.Group as={Row} controlId="form.selectBufferEncoding">
+                            <Form.Label column sm="2"></Form.Label>
+                            <Col sm="5">
+                                <Form.Control as="select" onChange={handleWordChange}>
+                                <option value="128">12</option>
+                                <option value="160">15</option>
+                                <option value="192">18</option>
+                                <option value="224">21</option>
+                                <option value="256">24</option>
+                                </Form.Control>
+                            </Col>
+                                Words
+                        </Form.Group>
                     </Col>
                 </Row>
                 
@@ -187,7 +219,7 @@ export default class ReactComponent extends React.Component {
                         
                     </Form.Group>
                 </Form>
-
+                {validBip39Mnemonic ? null : <p style={{color: "red"}}><i>Given mnemonic is not a valid BIP39 mnemonic</i></p>}
             </Col>
             <Col>
             </Col>
@@ -312,8 +344,8 @@ export default class ReactComponent extends React.Component {
                                 <tr key={i}>
                                     <td>{a.path}</td>
                                     <td>{a.address}</td>
-                                    <td>{a.keys.publicKey.toString("hex")}</td>
-                                    <td>{a.keys.privateKey.toString("hex")}</td>
+                                    <td>{a.keys.publicKey}</td>
+                                    <td>{a.keys.privateKey}</td>
                                 </tr>
                             ) : ""}
                         </tbody>
@@ -324,10 +356,6 @@ export default class ReactComponent extends React.Component {
     );
   }
 }
-
-
-
-
 
 /**
  * Creates points on the Elliptic Curve for the KeyPair
@@ -406,60 +434,46 @@ function getAddressFromPublicKey(publicKey, prefix) {
 	return address;
 }
 
-
-/**
- * Gets a publicKey from Passphrase Mnemonic
- *
- * @method getPublicKeyFromMnemonic
- * @param {String} menmonic the given mnemonic
- * @param {String} bip44account the given bip44account number point of BIP44
- * @param {String} bip44address the given address point of BIP44
- * @return {Buffer}
- */
-function getPublicKeyFromMnemonic (mnemonic, bip44account = 0, bip44address = 0) {
-	const keypair = getKeyPairFromMnemonic(mnemonic, bip44account, bip44address);
-
-	return secp256k1.publicKeyCreate(keypair.privateKey)
-}
-
-/**
- * Gets a EC privateKey from Passphrase Mnemonic
- *
- * @method getPrivateKeyFromMnemonic
- * @param {String} menmonic the given mnemonic
- * @param {String} bip44account the given account number point of BIP44
- * @param {String} bip44address the given bip44address point of BIP44
- * @return {Buffer} 
- */
-
-function getPrivateKeyFromMnemonic (mnemonic, bip44account, bip44address) {
-	const keypair = getKeyPairFromMnemonic(mnemonic, bip44account, bip44address);
-	return keypair.privateKey;
-}
-
-/**
- * Gets an address from a mnemonic
- *
- * @method getAddressFromMnemonic
- * @param {String} menmonic the given mnemonic
- * @param {String} bip44account the given account number point of BIP44
- * @param {String} bip44address the given address point of BIP44
- * @return {String}
- */
-
-function getAddressFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=0) {
-	const publicKey = getPublicKeyFromMnemonic(mnemonic, bip44account, bip44address);
-	return getAddressFromPublicKey(publicKey, prefix);
-}
-
 /**
  * Creates a new mnemonic
  *
  * @method newMnemonic
  * @return {String}
  */
-function newMnemonic() {
-    return bip39.generateMnemonic();
+function newMnemonic(entropySize) {
+    return bip39.generateMnemonic(entropySize);
+}
+
+/**
+ * Gets an account from a mnemonic
+ *
+ * @method getAccountFromMnemonic
+ * @param {String} menmonic the given mnemonic
+ * @param {String} bip44account the given account number point of BIP44
+ * @param {String} address the given address point of BIP44
+ * @return {String}
+ */
+function getAccountFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=0) {
+    const keypair = getKeyPairFromMnemonic(mnemonic, bip44account, bip44address);
+    const publicKey = secp256k1.publicKeyCreate(keypair.privateKey)
+    
+	return {
+		address: getAddressFromPublicKey(publicKey, prefix),
+		bip44path: bip44path(bip44account, bip44address),
+        publicKey: publicKey,
+        privateKey: keypair.privateKey,
+	};
+}
+
+/**
+ * validates a mnemonic
+ *
+ * @method validateMnemonic
+ * @param {String} menmonic the given mnemonic
+ * @return {String}
+ */
+function validateMnemonic(mnemonic) {
+    return bip39.validateMnemonic(mnemonic);
 }
 
 
