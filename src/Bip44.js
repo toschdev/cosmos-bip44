@@ -18,6 +18,7 @@ import GithubCorner from 'react-github-corner';
 import loadingPic from './loading.gif';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons';
+import logo from './logo.png';
 
 const bip39 = require('bip39');
 const bip32 = require('bip32');
@@ -215,6 +216,7 @@ export default class ReactComponent extends React.Component {
         
         <Row style={{padding: "30px"}}>
             <Col>
+            <img src={logo} className="logo" alt="logo" width="150" />
             </Col>
             <Col xs={8}>
                 
