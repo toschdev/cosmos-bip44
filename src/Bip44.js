@@ -16,6 +16,8 @@ import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import GithubCorner from 'react-github-corner';
 import loadingPic from './loading.gif';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestion } from '@fortawesome/free-solid-svg-icons';
 
 const bip39 = require('bip39');
 const bip32 = require('bip32');
@@ -38,6 +40,7 @@ export default class ReactComponent extends React.Component {
       encoding: "hex",
       wordEntropy: "128",
       validBip39Mnemonic: true,
+      coin: "118"
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -47,6 +50,7 @@ export default class ReactComponent extends React.Component {
     this.handleEncodingChange = this.handleEncodingChange.bind(this);
     this.onClickMnemonic = this.onClickMnemonic.bind(this);
     this.handleWordChange = this.handleWordChange.bind(this);
+    this.handleCoinChange = this.handleCoinChange.bind(this);
   }
 
   handleInputChange(event) {
@@ -92,12 +96,12 @@ export default class ReactComponent extends React.Component {
   }
 
   getAddressData() {
-    let { mnemonic, account, prefix, encoding } = this.state;
+    let { mnemonic, account, prefix, encoding, coin } = this.state;
     let walletData = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
 
     let returnData = walletData.map((a, i) => {
         console.log(account);
-        const acc = getAccountFromMnemonic(mnemonic, prefix, account, i);
+        const acc = getAccountFromMnemonic(mnemonic, prefix, account, i, coin);
         let obj = {
             index: i,
             path: acc.bip44path,
@@ -171,11 +175,36 @@ export default class ReactComponent extends React.Component {
     this.setState({
         wordEntropy: word
     });
+
+    setTimeout(() => {
+        let addressData = this.getAddressData();
+    
+        this.setState({
+          addressData,
+          loading: false,
+        });
+    }, 100);
+  }
+
+  handleCoinChange(event) {
+    let coin = event.target.value;
+    this.setState({
+        coin
+    });
+
+    setTimeout(() => {
+        let addressData = this.getAddressData();
+    
+        this.setState({
+          addressData,
+          loading: false,
+        });
+    }, 100);
   }
 
   render() {
-    const { mnemonic, account, prefix, addressData, validBip39Mnemonic, loading } = this.state;
-    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic, handleWordChange } = this;
+    const { mnemonic, account, coin, prefix, addressData, validBip39Mnemonic, loading } = this.state;
+    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic, handleWordChange, handleCoinChange } = this;
     return (
         <div>
             <div className="loading" style={{display: loading ? "block" : "none"}}>
@@ -221,7 +250,7 @@ export default class ReactComponent extends React.Component {
                         </Col>  
                         <Col>
                         <OverlayTrigger trigger="click" placement="top" overlay={popoverMnemonic}>
-                            <Button variant="primary">?</Button>
+                            <Button variant="primary"><FontAwesomeIcon style={{marginTop: "5px"}} icon={faQuestion} /></Button>
                         </OverlayTrigger>
                     </Col>
                     </Form.Group>
@@ -239,7 +268,6 @@ export default class ReactComponent extends React.Component {
             <Col xs={8}>
                 
                 <h2>Derivation Path</h2>
-
                 <Form.Group as={Row} controlId="formPurpose">
                     <Form.Label column sm="2">
                         Purpose
@@ -254,7 +282,7 @@ export default class ReactComponent extends React.Component {
                     </Col>
                     <Col>
                         <OverlayTrigger trigger="click" placement="top" overlay={popoverPurpose}>
-                            <Button variant="primary">?</Button>
+                            <Button variant="primary"><FontAwesomeIcon style={{marginTop: "5px"}} icon={faQuestion} /></Button>
                         </OverlayTrigger>
                     </Col>
 
@@ -266,7 +294,7 @@ export default class ReactComponent extends React.Component {
                     </Form.Label>
                     <Col sm="9">
                         <InputGroup className="mb-2">
-                            <Form.Control type="text" value="118" readOnly />
+                            <Form.Control type="numeric" value={coin}  onChange={handleCoinChange} />
                             <InputGroup.Append>
                             <InputGroup.Text>'</InputGroup.Text>
                             </InputGroup.Append>
@@ -274,7 +302,7 @@ export default class ReactComponent extends React.Component {
                     </Col>
                     <Col>
                         <OverlayTrigger trigger="click" placement="top" overlay={popoverCoin}>
-                            <Button variant="primary">?</Button>
+                            <Button variant="primary"><FontAwesomeIcon style={{marginTop: "5px"}} icon={faQuestion} /></Button>
                         </OverlayTrigger>
                     </Col>
                 </Form.Group>
@@ -293,7 +321,7 @@ export default class ReactComponent extends React.Component {
                     </Col>
                     <Col>
                         <OverlayTrigger trigger="click" placement="top" overlay={popoverAccount}>
-                            <Button variant="primary">?</Button>
+                            <Button variant="primary"><FontAwesomeIcon style={{marginTop: "5px"}} icon={faQuestion} /></Button>
                         </OverlayTrigger>
                     </Col>
                 </Form.Group>
@@ -307,7 +335,7 @@ export default class ReactComponent extends React.Component {
                     </Col>
                     <Col>
                         <OverlayTrigger trigger="click" placement="top" overlay={popoverExternal}>
-                            <Button variant="primary">?</Button>
+                            <Button variant="primary"><FontAwesomeIcon style={{marginTop: "5px"}} icon={faQuestion} /></Button>
                         </OverlayTrigger>
                     </Col>
                 </Form.Group>
@@ -478,7 +506,7 @@ class ECPair {
  * @return {String}
  */
 
-const bip44path = (bip44account = 0, bip44address = 0) => `m/44'/118'/${bip44account}'/0/${bip44address}`;
+const bip44path = (bip44account = 0, bip44address = 0, coin = 118) => `m/44'/${coin}'/${bip44account}'/0/${bip44address}`;
 
 
 /**
@@ -491,10 +519,10 @@ const bip44path = (bip44account = 0, bip44address = 0) => `m/44'/118'/${bip44acc
  * @return {Object} { privateKey, publicKey }
  */
 
-function getKeyPairFromMnemonic(mnemonic, bip44account = 0, bip44address = 0) {
+function getKeyPairFromMnemonic(mnemonic, bip44account = 0, bip44address = 0, coin = 118) {
 	const seed = bip39.mnemonicToSeedSync(mnemonic);
 	const node = bip32.fromSeed(seed);
-    const child = node.derivePath(bip44path(bip44account, bip44address));
+    const child = node.derivePath(bip44path(bip44account, bip44address, coin));
 	const ecpair = new ECPair(child.privateKey);
 
 	return {
@@ -539,13 +567,13 @@ function newMnemonic(entropySize) {
  * @param {String} address the given address point of BIP44
  * @return {String}
  */
-function getAccountFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=0) {
-    const keypair = getKeyPairFromMnemonic(mnemonic, bip44account, bip44address);
+function getAccountFromMnemonic (mnemonic, prefix, bip44account=0, bip44address=0, coin=118) {
+    const keypair = getKeyPairFromMnemonic(mnemonic, bip44account, bip44address, coin);
     const publicKey = secp256k1.publicKeyCreate(keypair.privateKey)
     
 	return {
 		address: getAddressFromPublicKey(publicKey, prefix),
-		bip44path: bip44path(bip44account, bip44address),
+		bip44path: bip44path(bip44account, bip44address, coin),
         publicKey: publicKey,
         privateKey: keypair.privateKey,
 	};
