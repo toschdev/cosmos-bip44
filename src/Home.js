@@ -32,6 +32,9 @@ export default class Home extends React.Component {
             <p>
             Please make sure when working with passphrases, to always create backups
             </p>
+            <p>
+                This tool is intended for education, development or testing purposes, not real coins.
+            </p>
             <Button onClick={this.handleClick} variant="primary" size="lg">Get Started</Button>{' '}
         </header>}
         </div>
