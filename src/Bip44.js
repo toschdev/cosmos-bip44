@@ -173,6 +173,7 @@ export default class ReactComponent extends React.Component {
   handleWordChange(event) {
     let word = event.target.value;
     this.setState({
+        loading: true,
         wordEntropy: word
     });
 
@@ -189,6 +190,7 @@ export default class ReactComponent extends React.Component {
   handleCoinChange(event) {
     let coin = event.target.value;
     this.setState({
+        loading: true,
         coin
     });
 
