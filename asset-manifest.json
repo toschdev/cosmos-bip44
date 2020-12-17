@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/cosmos-bip44/static/css/main.9b352f17.chunk.css",
-    "main.js": "/cosmos-bip44/static/js/main.7ac6773f.chunk.js",
-    "main.js.map": "/cosmos-bip44/static/js/main.7ac6773f.chunk.js.map",
+    "main.js": "/cosmos-bip44/static/js/main.6e91132f.chunk.js",
+    "main.js.map": "/cosmos-bip44/static/js/main.6e91132f.chunk.js.map",
     "runtime-main.js": "/cosmos-bip44/static/js/runtime-main.cfeeb45b.js",
     "runtime-main.js.map": "/cosmos-bip44/static/js/runtime-main.cfeeb45b.js.map",
     "static/css/2.20aa2d7b.chunk.css": "/cosmos-bip44/static/css/2.20aa2d7b.chunk.css",
@@ -21,6 +21,6 @@
     "static/css/2.20aa2d7b.chunk.css",
     "static/js/2.1698ad10.chunk.js",
     "static/css/main.9b352f17.chunk.css",
-    "static/js/main.7ac6773f.chunk.js"
+    "static/js/main.6e91132f.chunk.js"
   ]
 }
