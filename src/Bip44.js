@@ -41,7 +41,8 @@ export default class ReactComponent extends React.Component {
       encoding: "hex",
       wordEntropy: "128",
       validBip39Mnemonic: true,
-      coin: "118"
+      coin: "118",
+      numAccounts: "20",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -52,6 +53,7 @@ export default class ReactComponent extends React.Component {
     this.onClickMnemonic = this.onClickMnemonic.bind(this);
     this.handleWordChange = this.handleWordChange.bind(this);
     this.handleCoinChange = this.handleCoinChange.bind(this);
+    this.handleRowsChange = this.handleRowsChange.bind(this);
   }
 
   handleInputChange(event) {
@@ -96,9 +98,29 @@ export default class ReactComponent extends React.Component {
     }, 100);
   }
 
+  handleRowsChange(event) {
+    let numAccounts = event.target.value;
+    if(!(!isNaN(parseInt(numAccounts)) && isFinite(numAccounts))) {
+        numAccounts = 0;
+    }
+    this.setState({
+        loading: true,
+        numAccounts,
+    });
+
+    setTimeout(() => {
+        let addressData = this.getAddressData();
+    
+        this.setState({
+          addressData,
+          loading: false,
+        });
+    }, 100);
+  }
+
   getAddressData() {
-    let { mnemonic, account, prefix, encoding, coin } = this.state;
-    let walletData = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    let { mnemonic, account, prefix, encoding, coin, numAccounts } = this.state;
+    let walletData = Array.from(Array(parseInt(numAccounts)).keys())
 
     let returnData = walletData.map((a, i) => {
         console.log(account);
@@ -206,8 +228,8 @@ export default class ReactComponent extends React.Component {
   }
 
   render() {
-    const { mnemonic, account, coin, prefix, addressData, validBip39Mnemonic, loading } = this.state;
-    const { handleInputChange, handleAccountChange, handlePrefixChange, handleEncodingChange, onClickMnemonic, handleWordChange, handleCoinChange } = this;
+    const { mnemonic, account, coin, prefix, addressData, validBip39Mnemonic, loading, numAccounts } = this.state;
+    const { handleInputChange, handleAccountChange, handleRowsChange, handlePrefixChange, handleEncodingChange, onClickMnemonic, handleWordChange, handleCoinChange } = this;
     return (
         <div>
             <div className="loading" style={{display: loading ? "block" : "none"}}>
@@ -384,6 +406,12 @@ export default class ReactComponent extends React.Component {
                         </Form.Group>
                     </Col>
                     <Col>
+                        <Form.Group as={Row} controlId="form.selectNumberRows">
+                            <Form.Label column sm="2">Number of rows</Form.Label>
+                            <Col sm="5">
+                                <Form.Control type="text" value={numAccounts} onChange={handleRowsChange} />
+                            </Col>
+                        </Form.Group>
                     </Col>
                 </Row>
                 
