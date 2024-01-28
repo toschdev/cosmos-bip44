@@ -4,7 +4,7 @@ This tool is designed to help developers and researchers when working with Cosmo
 
 Following the [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) Proposal, a range of keys can be created using a mnemonic passphrase and the cryptographic paths suggested.
 
-[Test it online](https://tosch110.github.io/cosmos-bip44/)
+[Test it online](https://toschdev.github.io/cosmos-bip44/)
 
 ## Available Scripts
 
